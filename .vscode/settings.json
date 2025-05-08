@@ -1,0 +1,4 @@
+{
+    "custom-md-pdf.footerTemplate": "<div style=\"z-index:5;font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif, 'Meiryo';font-size: 9px;letter-spacing: 0.06em; margin-left: 0.75cm;width:540px;\"><div style=\"margin-bottom: -5px;border-top: 1px solid #000000;padding-top: 10px; justify-content:space-between; display:flex;\"><span>Stanley LORREUS</span><span>sloreus96@yahoo.fr</span></div><div style=\"justify-content:center; display:flex;\"><div style=\"font-size: 9px;\">&#10022; <span class='pageNumber'></span> / <span class='totalPages'></span> &#10022;</div></div></div>",
+    "custom-md-pdf.headerTemplate": "<div style=\"font-size: 9px; margin-left: 100cm;\"> <span class='title'></span></div> <div style=\"font-size: 9px; margin-left: auto; margin-right: 1cm; \"> <span class='date'></span></div>"
+}
