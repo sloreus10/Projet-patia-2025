@@ -8,6 +8,6 @@ public class SokobanMain {
         gameRunner.setAgent(Agent.class);
         gameRunner.setTestCase("test21.json");
 
-        gameRunner.start();
+        gameRunner.start(4200);
     }
 }
