@@ -28,7 +28,7 @@ Pour resoudre l'exercice des Tours Hanoi avec trois diques en PDDL, j'ai implém
   ```
 - Saisi 200 pour le timeout
 
-# 1 - 0 . Taquin (sans PDDL)
+## 1 - 0 . Taquin (sans PDDL)
 
 ### Description
 
@@ -48,11 +48,19 @@ taquin/
 │   └── performance_analysis.ipynb
 └── README.md
 
-#### Utilisation
+### Utilisation
 
-### Génération des benchmarks :
+#### Génération des benchmarks :
 
-```python scripts/generate_npuzzle.py -s 3 -ml 5 -n 10 benchmarks -v```
+```
+python3 generate_npuzzle.py -s 3 -ml 10 -n 10 benchmarks -v
+```
+
+ou
+
+```
+python generate_npuzzle.py -s 3 -ml 10 -n 10 benchmarks -v
+```
 
 ### Résolution avec algo bfs :
 
