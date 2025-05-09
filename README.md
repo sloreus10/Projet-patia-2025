@@ -28,7 +28,7 @@ Pour resoudre l'exercice des Tours Hanoi avec trois diques en PDDL, j'ai implém
   ```
 - Saisi 200 pour le timeout
 
-## 1 - 0 . Taquin (sans PDDL)
+## 2 - 0 . Taquin (sans PDDL)
 
 ### Description
 
@@ -74,17 +74,58 @@ python generate_npuzzle.py -s 3 -ml 10 -n 10 benchmarks -v
 
 ```python scripts/solve_npuzzle.py benchmarks/npuzzle_3x3_len1_0.txt -a astar -v```
 
-#### Analyse des performances
+### Résolution des benchmarks de manières auto et stocker les résultats dans le fichier results.csv
 
-```jupyter notebook scripts/performance_analysis.ipynb```
+```
+cd n-puzzle
+python3 benchmark_runner.py
+```
 
-##### Encodage
+#### Visualiser la courbe de la performance des algos
 
-- Chaque tuile est représentée par une lettre (A, B, C...)
-- La case vide est représentée par 0
-- Format : A 0 B C D E F G H pour un 3x3
+```
+jupyter notebook visualize_benchmark.ipynb
+```
 
-##### Résultats
+## 2 - 1. Taquin en pddl
 
-- Graphiques comparant les temps d'exécution
-- Analyse de la complexité en fonction de la taille
+### Toujours dans le dossier n-puzzle :
+
+- Le fichier domain : domain.pddl
+- On génère les problèmes pddl depuis les benchmarks du dossier benchmarks dans le dossier pddl_problems en exécutant cette la commande :
+
+  ```
+  python3 generate_pddl_problems.py
+  ```
+
+  ou
+
+  ```
+  python generate_pddl_problems.py
+  ```
+
+### Pour tester avec pddl :
+
+On se place dans le dossier racine du projet et exécuter la commande :
+
+```
+./pddl4j.sh
+```
+
+Puis on suit les étapes tout en choisissant l'option 2 qui est FF
+
+- Le domain :
+
+  ```
+  ./n-puzzle/domain.pddl
+  ```
+- Un exemple de problèm :
+
+  ```
+  ./n-puzzle/pddl_problems/npuzzle_3x3_len1_0.pddl
+  ```
+
+Pour le timeout : 200
+
+
+## 2. sokoban
