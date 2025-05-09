@@ -12,10 +12,11 @@ from npuzzle import (Solution,
                      to_string,
                      create_goal)
 from node import Node
-from typing import Literal, List
+from typing import Literal, List, Dict, Tuple
 import argparse
 import math
 import time
+import copy
 
 BFS = 'bfs'
 DFS = 'dfs'
@@ -40,23 +41,37 @@ def solve_bfs(open: List[Node]) -> Solution:
     return []
 
 def solve_dfs(open: List[Node]) -> Solution:
-    '''Solve the puzzle using the DFS algorithm'''
-    dimension = int(math.sqrt(len(open[0].get_state())))
-    moves = [UP, DOWN, LEFT, RIGHT]
-    visited = set()  # To keep track of visited states
-    while open:
-        node = open.pop()
+    '''Solve the puzzle using the DFS algorithm with iterative deepening'''
+    def dls(node: Node, depth: int, dimension: int, visited: set) -> Solution:
         if is_goal(node.get_state()):
             return node.get_path()
+        if depth == 0:
+            return []
+
+        visited.add(tuple(node.get_state()))
         puzzle = node.get_state()
         k = node.cost
-        children = get_children(puzzle, moves, dimension)
+        children = get_children(puzzle, [UP, DOWN, LEFT, RIGHT], dimension)
+
         for child in children:
             child_state = tuple(child[0])
             if child_state not in visited:
-                visited.add(child_state)
                 n = Node(state=child[0], move=child[1], parent=node, cost=k + 1)
-                open.append(n)
+                result = dls(n, depth - 1, dimension, visited)
+                if result:
+                    return result
+        return []
+
+    dimension = int(math.sqrt(len(open[0].get_state())))
+    root = open[0]
+    max_depth = 50  # Ajustable selon la complexité du puzzle
+
+    for current_depth in range(max_depth + 1):
+        visited = set()
+        result = dls(root, current_depth, dimension, visited)
+        if result:
+            return result
+
     return []
 
 def solve_astar(open: List[Node], close: List[Node]) -> Solution:
