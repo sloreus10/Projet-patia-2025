@@ -87,6 +87,8 @@ python3 benchmark_runner.py
 jupyter notebook visualize_benchmark.ipynb
 ```
 
+NB : C'est pas encore complètement fonctionnel
+
 ## 2 - 1. Taquin en pddl
 
 ### Toujours dans le dossier n-puzzle :
@@ -128,4 +130,6 @@ Puis on suit les étapes tout en choisissant l'option 2 qui est FF
 Pour le timeout : 200
 
 
-## 2. sokoban
+## 3. sokoban
+
+Pour le sokoban, il faut se rendre dans le dossier sokoban

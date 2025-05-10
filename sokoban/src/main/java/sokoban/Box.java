@@ -20,8 +20,8 @@ public class Box {
 
     public void updateSprite() {
         sprite.setImage(isSolved() ? "crateSolved.png" : "crateUnsolved.png")
-                .setX(cell.getX()*Board.SPRITE_SIZE)
-                .setY(cell.getY()*Board.SPRITE_SIZE);
+                .setX(cell.getX() * Board.SPRITE_SIZE)
+                .setY(cell.getY() * Board.SPRITE_SIZE);
         tooltipModule.setTooltipText(sprite, "BOX\nx: " + cell.getX() + "\ny: " + cell.getY());
     }
 

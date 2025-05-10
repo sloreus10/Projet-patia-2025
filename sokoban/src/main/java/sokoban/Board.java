@@ -52,7 +52,6 @@ public class Board {
         }
         pusher.getCell().visit();
 
-        //BufferedGroup bufferedGroup = graphics.createBufferedGroup().setZIndex(-1);
         Group bufferedGroup = graphics.createGroup().setZIndex(-1);
         group.add(bufferedGroup);
         int xMin = 0, yMin = 0, xMax = width, yMax = height;
@@ -71,25 +70,24 @@ public class Board {
                 }
                 sprite.setX(x * SPRITE_SIZE).setY(y * SPRITE_SIZE);
                 bufferedGroup.add(sprite);
-
             }
         }
     }
 
     public boolean isWin() {
-        return boxes.stream().allMatch(b -> b.isSolved());
+        return boxes.stream().allMatch(Box::isSolved);
     }
 
     public ArrayList<String> getInput(boolean firstTurn) {
         ArrayList<String> result = new ArrayList<>();
         if (firstTurn) {
-            result.add(width + " " + height + " " + (boxes.size()));
+            result.add(width + " " + height + " " + boxes.size());
             for (int y = 0; y < height; y++) {
-                String line = "";
+                StringBuilder line = new StringBuilder();
                 for (int x = 0; x < width; x++) {
-                    line += grid[x][y].getMapChar();
+                    line.append(grid[x][y].getMapChar());
                 }
-                result.add(line);
+                result.add(line.toString());
             }
         }
         result.add(pusher.getCell().getInput());
