@@ -2,11 +2,16 @@ package sokoban;
 
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.json.JSONException;
 
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Ce parseur lit un fichier JSON contenant une représentation textuelle d’un niveau de Sokoban
+ * et génère un fichier PDDL décrivant le problème correspondant.
+ */
 public class ParserJsonToPDDL {
 
     public static void main(String[] args) {
@@ -22,13 +27,24 @@ public class ParserJsonToPDDL {
             parseJsonToPDDL(jsonFilePath, pddlFilePath);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (JSONException e) {
+            System.err.println("Error parsing JSON file: " + e.getMessage());
+            System.exit(1);
         }
     }
 
+    /**
+     * Convertit une carte Sokoban représentée en JSON vers le format PDDL.
+     *
+     * @param jsonFilePath  chemin vers le fichier JSON d'entrée
+     * @param pddlFilePath  chemin vers le fichier PDDL de sortie
+     * @throws IOException  en cas de problème de lecture/écriture de fichiers
+     */
     public static void parseJsonToPDDL(String jsonFilePath, String pddlFilePath) throws IOException {
         FileInputStream fis = new FileInputStream(jsonFilePath);
         JSONObject jsonObject = new JSONObject(new JSONTokener(fis));
 
+        // Lecture de la carte du niveau
         String testIn = jsonObject.getString("testIn");
         String[] lines = testIn.split("\n");
 
@@ -36,43 +52,79 @@ public class ParserJsonToPDDL {
 
         writer.write("(define (problem sokoban-level1)\n");
         writer.write("  (:domain sokoban)\n");
-        writer.write("  (:objects\n");
 
-        // Write objects
-        for (int i = 0; i < lines.length; i++) {
-            for (int j = 0; j < lines[i].length(); j++) {
-                writer.write("    l" + (i * lines[i].length() + j + 1) + "\n");
+        // Déclaration des objets
+        writer.write("  (:objects\n");
+        int rows = lines.length;
+        int cols = lines[0].length();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                writer.write("    l" + i + "_" + j + " - sol\n");
+            }
+        }
+        writer.write("    a - agent\n");
+        writer.write("    b - boite\n");
+        writer.write("  )\n");
+
+        // Initialisation de l’état
+        writer.write("  (:init\n");
+
+        // Ajout des relations de voisinage
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                String loc = "l" + i + "_" + j;
+                if (j < cols - 1) {
+                    String rightLoc = "l" + i + "_" + (j + 1);
+                    writer.write("    (a_voisin_droit " + loc + " " + rightLoc + ")\n");
+                }
+                if (i < rows - 1) {
+                    String upLoc = "l" + (i + 1) + "_" + j;
+                    writer.write("    (a_voisin_haut " + loc + " " + upLoc + ")\n");
+                }
             }
         }
 
-        writer.write("  )\n");
-        writer.write("  (:init\n");
+        // Écriture des états initiaux
+        for (int i = 0; i < rows; i++) {
+            String line = lines[i];
+            for (int j = 0; j < line.length(); j++) {
+                char c = line.charAt(j);
+                String loc = "l" + i + "_" + j;
 
-        // Write initial state
-        for (int i = 0; i < lines.length; i++) {
-            for (int j = 0; j < lines[i].length(); j++) {
-                char c = lines[i].charAt(j);
-                if (c == '#') {
-                    writer.write("    (wall l" + (i * lines[i].length() + j + 1) + ")\n");
-                } else if (c == '$') {
-                    writer.write("    (box l" + (i * lines[i].length() + j + 1) + ")\n");
-                } else if (c == '.') {
-                    writer.write("    (goal l" + (i * lines[i].length() + j + 1) + ")\n");
-                } else if (c == '@') {
-                    writer.write("    (player l" + (i * lines[i].length() + j + 1) + ")\n");
+                switch (c) {
+                    case '#':
+                        // Mur : on ne le mentionne pas (implicite, non libre)
+                        break;
+                    case '$':
+                        writer.write("    (boite_est_sur b " + loc + ")\n");
+                        break;
+                    case '.':
+                        writer.write("    (est_destination " + loc + ")\n");
+                        writer.write("    (est_libre " + loc + ")\n");
+                        break;
+                    case '@':
+                        writer.write("    (agent_est_sur a " + loc + ")\n");
+                        break;
+                    default:
+                        writer.write("    (est_libre " + loc + ")\n");
+                        break;
                 }
             }
         }
 
         writer.write("  )\n");
+
+        // But : la boîte doit être sur une destination
         writer.write("  (:goal (and\n");
 
-        // Write goal state
-        for (int i = 0; i < lines.length; i++) {
-            for (int j = 0; j < lines[i].length(); j++) {
-                char c = lines[i].charAt(j);
+        for (int i = 0; i < rows; i++) {
+            String line = lines[i];
+            for (int j = 0; j < line.length(); j++) {
+                char c = line.charAt(j);
+                String loc = "l" + i + "_" + j;
+
                 if (c == '.') {
-                    writer.write("    (box l" + (i * lines[i].length() + j + 1) + ")\n");
+                    writer.write("    (boite_est_sur b " + loc + ")\n");
                 }
             }
         }
@@ -80,6 +132,7 @@ public class ParserJsonToPDDL {
         writer.write("  ))\n");
         writer.write(")\n");
 
+        // Fermeture des flux
         writer.close();
         fis.close();
     }

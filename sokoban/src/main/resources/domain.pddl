@@ -1,83 +1,182 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Sokoban
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Domaine PDDL : Sokoban
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (domain sokoban)
 
-(:requirements :strips :typing)
-(:types sol
-        boite
-        agent)
-(:predicates
-    (boiteEstSur ?boite - boite ?sol - sol)     ;boiteEstSur : Spécifie que la boite ?boite est sur le sol ?sol
-    (agentEstSur ?agent - agent ?sol - sol)     ;agentEstSur : Spécifie que l'agent ?agent est sur le sol ?sol
-    (aVoisinDroit ?x - sol ?y - sol)            ;aVoisinDroit : Spécifie que le sol ?y est à droite du sol ?x (indirectement le sol ?x est à gauche du sol ?y)
-    (aVoisinHaut ?x - sol ?y - sol)             ;aVoisinHaut : Spécifie que le sol ?y est en haut du sol ?x (indirectement le sol ?x est en bas du sol ?y)
-    (estDestination ?sol - sol)                 ;estDestination : Marque le sol ?sol comme étant une destination à atteindre par les boites
-    (boiteSurCible ?boite - boite)              ;boiteSurCible : Spécifie que la boite ?boite est sur un sol de destination
-    (estLibre ?sol - sol)                       ;estLibre : Spécifie que le sol ?sol est libre
-)
+  ;; On utilise STRIPS (base), typing (types d'objets) et equality (égalité si besoin)
+  (:requirements :strips :typing :equality)
 
-;deplacementDroit : Déplace l'agent ?agent1 à droite, du sol ?env1 vers le sol ?env2
-(:action deplacementDroit
-    :parameters (?agent1 - agent ?env1 - sol ?env2 - sol)
-    :precondition (and (aVoisinDroit ?env1 ?env2) (agentEstSur ?agent1 ?env1) (estLibre ?env2))
-    :effect (and (agentEstSur ?agent1 ?env2) (not (agentEstSur ?agent1 ?env1)))
-)
+  ;; Définition des types d'objets
+  (:types
+    sol      ;; case du sol
+    boite    ;; boîte à déplacer
+    agent    ;; le joueur (Sokoban)
+  )
 
-;deplacementHaut : Déplace l'agent ?agent1 en haut, du sol ?env1 vers le sol ?env2
-(:action deplacementHaut
-    :parameters (?agent1 - agent ?env1 - sol ?env2 - sol)
-    :precondition (and (agentEstSur ?agent1 ?env1) (aVoisinHaut ?env1 ?env2) (estLibre ?env2))
-    :effect (and (agentEstSur ?agent1 ?env2) (not (agentEstSur ?agent1 ?env1)))
-)
+  ;; Déclaration des prédicats
+  (:predicates
+    ;; La boîte ?b est sur la case ?s
+    (boite_est_sur ?b - boite ?s - sol)
 
-;deplacementGauche : Déplace l'agent ?agent1 à gauche, du sol ?env1 vers le sol ?env2
-(:action deplacementGauche
-    :parameters (?agent1 - agent ?env1 - sol ?env2 - sol)
-    :precondition (and (agentEstSur ?agent1 ?env1) (aVoisinDroit ?env2 ?env1) (estLibre ?env2))
-    :effect (and (agentEstSur ?agent1 ?env2) (not (agentEstSur ?agent1 ?env1)))
-)
+    ;; L’agent est sur la case ?s
+    (agent_est_sur ?a - agent ?s - sol)
 
-;deplacementBas : Déplace l'agent ?agent1 en bas, du sol ?env1 vers le sol ?env2
-(:action deplacementBas
-    :parameters (?agent1 - agent ?env1 - sol ?env2 - sol)
-    :precondition (and (agentEstSur ?agent1 ?env1) (aVoisinHaut ?env2 ?env1) (estLibre ?env2))
-    :effect (and (agentEstSur ?agent1 ?env2) (not (agentEstSur ?agent1 ?env1)))
-)
+    ;; La case ?x a comme voisin à droite la case ?y
+    (a_voisin_droit ?x - sol ?y - sol)
 
-;pousserDroit : L'agent ?agent pousse la boite ?boite à droite, se déplaçant du sol ?env1 vers ?env2 pour pousser la boite ?boite s'y trouvant, du sol ?env2 vers ?env3
-(:action pousserDroit
-    :parameters (?agent - agent ?env1 - sol ?env2 - sol ?env3 - sol ?boite - boite)
-    :precondition (and (agentEstSur ?agent ?env1) (boiteEstSur ?boite ?env2) (aVoisinDroit ?env1 ?env2) (aVoisinDroit ?env2 ?env3) (estLibre ?env3))
-    :effect (and (boiteEstSur ?boite ?env3) (not(boiteEstSur ?boite ?env2)) (agentEstSur ?agent ?env2) (not(agentEstSur ?agent ?env1)) (not (boiteSurCible ?boite)) (estLibre ?env2) (not (estLibre ?env3)))
-)
+    ;; La case ?x a comme voisin au-dessus la case ?y
+    (a_voisin_haut ?x - sol ?y - sol)
 
-;pousserHaut : L'agent ?agent pousse la boite ?boite en haut, se déplaçant du sol ?env1 vers ?env2 pour pousser la boite ?boite s'y trouvant, du sol ?env2 vers ?env3
-(:action pousserHaut
-    :parameters (?agent - agent ?env1 - sol ?env2 - sol ?env3 - sol ?boite - boite)
-    :precondition (and (agentEstSur ?agent ?env1) (boiteEstSur ?boite ?env2) (aVoisinHaut ?env1 ?env2) (aVoisinHaut ?env2 ?env3) (estLibre ?env3))
-    :effect (and (boiteEstSur ?boite ?env3) (not(boiteEstSur ?boite ?env2)) (agentEstSur ?agent ?env2) (not(agentEstSur ?agent ?env1)) (not (boiteSurCible ?boite)) (estLibre ?env2) (not (estLibre ?env3)))
-)
+    ;; La case ?s est une destination cible
+    (est_destination ?s - sol)
 
-;pousserGauche : L'agent ?agent pousse la boite ?boite à gauche, se déplaçant du sol ?env1 vers ?env2 pour pousser la boite ?boite s'y trouvant, du sol ?env2 vers ?env3
-(:action pousserGauche
-    :parameters (?agent - agent ?env1 - sol ?env2 - sol ?env3 - sol ?boite - boite)
-    :precondition (and (agentEstSur ?agent ?env1) (boiteEstSur ?boite ?env2) (aVoisinDroit ?env2 ?env1) (aVoisinDroit ?env3 ?env2) (estLibre ?env3))
-    :effect (and (boiteEstSur ?boite ?env3) (not(boiteEstSur ?boite ?env2)) (agentEstSur ?agent ?env2) (not(agentEstSur ?agent ?env1)) (not (boiteSurCible ?boite)) (estLibre ?env2) (not (estLibre ?env3)))
-)
+    ;; La boîte ?b est placée sur une case cible
+    (boite_sur_cible ?b - boite)
 
-;pousserBas : L'agent ?agent pousse la boite ?boite en bas, se déplaçant du sol ?env1 vers ?env2 pour pousser la boite ?boite s'y trouvant, du sol ?env2 vers ?env3
-(:action pousserBas
-    :parameters (?agent - agent ?env1 - sol ?env2 - sol ?env3 - sol ?boite - boite)
-    :precondition (and (agentEstSur ?agent ?env1) (boiteEstSur ?boite ?env2) (aVoisinHaut ?env2 ?env1) (aVoisinHaut ?env3 ?env2) (estLibre ?env3))
-    :effect (and (boiteEstSur ?boite ?env3) (not(boiteEstSur ?boite ?env2)) (agentEstSur ?agent ?env2) (not(agentEstSur ?agent ?env1)) (not (boiteSurCible ?boite)) (estLibre ?env2) (not (estLibre ?env3)))
-)
+    ;; La case ?s est libre (pas d’agent ni de boîte)
+    (est_libre ?s - sol)
+  )
 
-;marquer : Marque la boite ?boite si le sol ?sol sur lequel elle se trouve est une destination
-(:action marquer
-    :parameters (?boite - boite ?sol - sol)
-    :precondition (and (boiteEstSur ?boite ?sol) (estDestination ?sol))
-    :effect (and (boiteSurCible ?boite))
-)
+  ;; Déplacement vers la droite
+  (:action deplacement_droit
+    :parameters (?a - agent ?s1 - sol ?s2 - sol)
+    :precondition (and
+      (a_voisin_droit ?s1 ?s2)
+      (agent_est_sur ?a ?s1)
+      (est_libre ?s2))
+    :effect (and
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s2))
+      (est_libre ?s1))
+  )
+
+  ;; Déplacement vers le haut
+  (:action deplacement_haut
+    :parameters (?a - agent ?s1 - sol ?s2 - sol)
+    :precondition (and
+      (a_voisin_haut ?s1 ?s2)
+      (agent_est_sur ?a ?s1)
+      (est_libre ?s2))
+    :effect (and
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s2))
+      (est_libre ?s1))
+  )
+
+  ;; Déplacement vers la gauche
+  (:action deplacement_gauche
+    :parameters (?a - agent ?s1 - sol ?s2 - sol)
+    :precondition (and
+      (a_voisin_droit ?s2 ?s1)
+      (agent_est_sur ?a ?s1)
+      (est_libre ?s2))
+    :effect (and
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s2))
+      (est_libre ?s1))
+  )
+
+  ;; Déplacement vers le bas
+  (:action deplacement_bas
+    :parameters (?a - agent ?s1 - sol ?s2 - sol)
+    :precondition (and
+      (a_voisin_haut ?s2 ?s1)
+      (agent_est_sur ?a ?s1)
+      (est_libre ?s2))
+    :effect (and
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s2))
+      (est_libre ?s1))
+  )
+
+  ;; Pousser une boîte vers la droite
+  (:action pousser_droit
+    :parameters (?a - agent ?s1 - sol ?s2 - sol ?s3 - sol ?b - boite)
+    :precondition (and
+      (agent_est_sur ?a ?s1)       ;; agent est sur la case s1
+      (boite_est_sur ?b ?s2)       ;; boîte est sur la case suivante s2
+      (a_voisin_droit ?s1 ?s2)       ;; s2 est à droite de s1
+      (a_voisin_droit ?s2 ?s3)       ;; s3 est à droite de s2 (prochaine case)
+      (est_libre ?s3))                ;; s3 est libre pour accueillir la boîte
+    :effect (and
+      (boite_est_sur ?b ?s3)
+      (not (boite_est_sur ?b ?s2))
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s3))
+      (est_libre ?s2)
+      (est_libre ?s1))
+  )
+
+  ;; Pousser une boîte vers le haut
+  (:action pousser_haut
+    :parameters (?a - agent ?s1 - sol ?s2 - sol ?s3 - sol ?b - boite)
+    :precondition (and
+      (agent_est_sur ?a ?s1)
+      (boite_est_sur ?b ?s2)
+      (a_voisin_haut ?s1 ?s2)
+      (a_voisin_haut ?s2 ?s3)
+      (est_libre ?s3))
+    :effect (and
+      (boite_est_sur ?b ?s3)
+      (not (boite_est_sur ?b ?s2))
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s3))
+      (est_libre ?s2)
+      (est_libre ?s1))
+  )
+
+  ;; Pousser une boîte vers la gauche
+  (:action pousser_gauche
+    :parameters (?a - agent ?s1 - sol ?s2 - sol ?s3 - sol ?b - boite)
+    :precondition (and
+      (agent_est_sur ?a ?s1)
+      (boite_est_sur ?b ?s2)
+      (a_voisin_droit ?s2 ?s1)
+      (a_voisin_droit ?s3 ?s2)
+      (est_libre ?s3))
+    :effect (and
+      (boite_est_sur ?b ?s3)
+      (not (boite_est_sur ?b ?s2))
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s3))
+      (est_libre ?s2)
+      (est_libre ?s1))
+  )
+
+  ;; Pousser une boîte vers le bas
+  (:action pousser_bas
+    :parameters (?a - agent ?s1 - sol ?s2 - sol ?s3 - sol ?b - boite)
+    :precondition (and
+      (agent_est_sur ?a ?s1)
+      (boite_est_sur ?b ?s2)
+      (a_voisin_haut ?s2 ?s1)
+      (a_voisin_haut ?s3 ?s2)
+      (est_libre ?s3))
+    :effect (and
+      (boite_est_sur ?b ?s3)
+      (not (boite_est_sur ?b ?s2))
+      (agent_est_sur ?a ?s2)
+      (not (agent_est_sur ?a ?s1))
+      (not (est_libre ?s3))
+      (est_libre ?s2)
+      (est_libre ?s1))
+  )
+
+  ;; Marquer une boîte comme placée sur une cible
+  (:action marquer
+    :parameters (?b - boite ?s - sol)
+    :precondition (and
+      (boite_est_sur ?b ?s)
+      (est_destination ?s))
+    :effect (boite_sur_cible ?b)
+  )
+
 )

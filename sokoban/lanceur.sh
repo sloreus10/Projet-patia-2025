@@ -10,18 +10,36 @@ compile_project() {
 # Function to convert JSON to PDDL
 convertJsonToPDDL() {
     jsonFile=$1
-    pddlFile="src/main/resources/pddl_problems/$1.pddl"
+    pddlFile="src/main/resources/pddl_problems/$(basename "$1" .json).pddl"
+
+    # Check if the JSON file exists
+    if [ ! -f "$jsonFile" ]; then
+        echo "File $jsonFile does not exist."
+        return 1
+    fi
 
     # Call your Java program or script to convert JSON to PDDL
     java -cp "target/sokoban-1.0-SNAPSHOT-jar-with-dependencies.jar" sokoban.ParserJsonToPDDL $jsonFile $pddlFile
 
-    echo "PDDL file generated: $pddlFile"
+    if [ -f "$pddlFile" ]; then
+        echo "PDDL file generated: $pddlFile"
+        return 0
+    else
+        echo "Error: Problem converting JSON to PDDL."
+        return 1
+    fi
 }
 
 # Function to solve with HSP
 solveHSP() {
     domainFile="src/main/resources/domain.pddl"
-    problemFile="src/main/resources/pddl_problems/$1.pddl"
+    problemFile="src/main/resources/pddl_problems/$(basename "$1" .json).pddl"
+
+    # Check if the PDDL problem file exists
+    if [ ! -f "$problemFile" ]; then
+        echo "Problem file $problemFile does not exist."
+        return 1
+    fi
 
     show_heuristic
 
@@ -49,7 +67,13 @@ solveHSP() {
 # Function to solve with FF
 solveFF() {
     domainFile="src/main/resources/domain.pddl"
-    problemFile="src/main/resources/pddl_problems/$1.pddl"
+    problemFile="src/main/resources/pddl_problems/$(basename "$1" .json).pddl"
+
+    # Check if the PDDL problem file exists
+    if [ ! -f "$problemFile" ]; then
+        echo "Problem file $problemFile does not exist."
+        return 1
+    fi
 
     read -p "Enter timeout in seconds [default 600]: " timeOut
     timeOut=${timeOut:-600}
@@ -91,12 +115,12 @@ read_main_options() {
     case $choice in
         1) read -p "Enter the name of the JSON file to test from the config folder: " exercice
            jsonFile="config/$exercice"
-           if [ -f "$jsonFile" ]; then
-               convertJsonToPDDL $exercice
+           if convertJsonToPDDL $jsonFile; then
                show_planner_menu
                read_planner_options $exercice
            else
-               echo "File $jsonFile does not exist."
+               show_main_menu
+               read_main_options
            fi ;;
         2) exit 0 ;;
         *) echo "Error..." && sleep 1
