@@ -1,25 +1,41 @@
 #!/bin/bash
 
-# Function to compile and package the project
+set -e
+
+# Chemins des fichiers et répertoires
+DOMAIN_FILE="src/main/resources/domain.pddl"
+PDDL_PROBLEMS_DIR="src/main/resources/pddl_problems"
+PLANS_STRING_DIR="src/main/resources/plansString"
+CONFIG_DIR="config"
+TARGET_JAR="target/sokoban-1.0-SNAPSHOT-jar-with-dependencies.jar"
+
+# Fonction pour compiler et packager le projet
 compile_project() {
+    echo "Compiling the project..."
     mvn clean
     mvn compile
     mvn package
+    if [ $? -ne 0 ]; then
+        echo "Error: Compilation failed."
+        exit 1
+    fi
+    echo "Compilation successful."
 }
 
-# Function to convert JSON to PDDL
+# Fonction pour convertir JSON en PDDL
 convertJsonToPDDL() {
-    jsonFile=$1
-    pddlFile="src/main/resources/pddl_problems/$(basename "$1" .json).pddl"
+    local jsonFile=$1
+    local pddlFile="$PDDL_PROBLEMS_DIR/$(basename "$1" .json).pddl"
 
-    # Check if the JSON file exists
+    # Vérifier si le fichier JSON existe
     if [ ! -f "$jsonFile" ]; then
-        echo "File $jsonFile does not exist."
+        echo "Error: File $jsonFile does not exist."
         return 1
     fi
 
-    # Call your Java program or script to convert JSON to PDDL
-    java -cp "target/sokoban-1.0-SNAPSHOT-jar-with-dependencies.jar" sokoban.ParserJsonToPDDL $jsonFile $pddlFile
+    # Appeler le programme Java pour convertir JSON en PDDL
+    echo "Converting JSON to PDDL..."
+    java -server -Xms2048m -Xmx2048m --add-opens java.base/java.lang=ALL-UNNAMED -cp "$TARGET_JAR" sokoban.ParserJsonToPDDL "$jsonFile" "$pddlFile"
 
     if [ -f "$pddlFile" ]; then
         echo "PDDL file generated: $pddlFile"
@@ -30,14 +46,14 @@ convertJsonToPDDL() {
     fi
 }
 
-# Function to solve with HSP
+# Fonction pour résoudre avec HSP
 solveHSP() {
-    domainFile="src/main/resources/domain.pddl"
-    problemFile="src/main/resources/pddl_problems/$(basename "$1" .json).pddl"
+    local problemFile="$PDDL_PROBLEMS_DIR/$(basename "$1" .json).pddl"
+    local planFile="$PLANS_STRING_DIR/$(basename "$1" .json).txt"
 
-    # Check if the PDDL problem file exists
+    # Vérifier si le fichier problème PDDL existe
     if [ ! -f "$problemFile" ]; then
-        echo "Problem file $problemFile does not exist."
+        echo "Error: Problem file $problemFile does not exist."
         return 1
     fi
 
@@ -55,33 +71,77 @@ solveHSP() {
         6) heuristic='SET_LEVEL' ;;
         7) heuristic='SUM' ;;
         8) heuristic='SUM_MUTEX' ;;
-        *) echo "Error..." && sleep 1 && return ;;
+        *) echo "Error: Invalid heuristic choice." && sleep 1 && return ;;
     esac
 
     read -p "Enter timeout in seconds [default 600]: " timeOut
     timeOut=${timeOut:-600}
 
-    java -cp "target/sokoban-1.0-SNAPSHOT-jar-with-dependencies.jar" fr.uga.pddl4j.planners.statespace.HSP $domainFile $problemFile -t $timeOut -e $heuristic
+    echo "Solving with HSP..."
+    java -server -Xms2048m -Xmx2048m --add-opens java.base/java.lang=ALL-UNNAMED -cp "$TARGET_JAR" fr.uga.pddl4j.planners.statespace.HSP "$DOMAIN_FILE" "$problemFile" -t "$timeOut" -e "$heuristic" > temp_plan.txt
+
+    # Afficher le plan brut
+    echo "Raw plan generated: "
+    cat temp_plan.txt
+
+    # Convertir le plan en chaîne et écrire dans un fichier
+    java -server -Xms2048m -Xmx2048m --add-opens java.base/java.lang=ALL-UNNAMED -cp "$TARGET_JAR" sokoban.ParserPlanToString temp_plan.txt > "$planFile"
+
+    # Afficher le plan
+    echo "Plan as movements: "
+    cat "$planFile"
+
+    # Nettoyer le fichier de plan temporaire
+    rm temp_plan.txt
+
+    # Exécuter Sokoban avec le plan généré
+    java -server -Xms2048m -Xmx2048m --add-opens java.base/java.lang=ALL-UNNAMED -cp "$TARGET_JAR" sokoban.SokobanMain "$1" "$planFile"
 }
 
-# Function to solve with FF
+# Fonction pour résoudre avec FF
 solveFF() {
-    domainFile="src/main/resources/domain.pddl"
-    problemFile="src/main/resources/pddl_problems/$(basename "$1" .json).pddl"
+    local problemFile="$PDDL_PROBLEMS_DIR/$(basename "$1" .json).pddl"
+    local planFile="$PLANS_STRING_DIR/$(basename "$1" .json).txt"
 
-    # Check if the PDDL problem file exists
+    # Vérifier si le fichier problème PDDL existe
     if [ ! -f "$problemFile" ]; then
-        echo "Problem file $problemFile does not exist."
+        echo "Error: Problem file $problemFile does not exist."
         return 1
     fi
 
     read -p "Enter timeout in seconds [default 600]: " timeOut
     timeOut=${timeOut:-600}
 
-    java -cp "target/sokoban-1.0-SNAPSHOT-jar-with-dependencies.jar" fr.uga.pddl4j.planners.statespace.FF $domainFile $problemFile -t $timeOut
+    echo "Solving with FF..."
+    echo "Running FF with the following parameters: Domain=$DOMAIN_FILE, Problem=$problemFile, Timeout=$timeOut"
+    java -server -Xms2048m -Xmx2048m --add-opens java.base/java.lang=ALL-UNNAMED -cp "$TARGET_JAR" fr.uga.pddl4j.planners.statespace.FF "$DOMAIN_FILE" "$problemFile" -t "$timeOut" > ff_output.log 2>&1
+
+    # Vérifier si FF a réussi
+    if [ $? -ne 0 ]; then
+        echo "Error: FF solver encountered an issue."
+        cat ff_output.log
+        return 1
+    fi
+
+    # Afficher le plan brut
+    echo "Raw plan generated: "
+    cat ff_output.log
+
+    # Convertir le plan en chaîne et écrire dans un fichier
+    java -server -Xms2048m -Xmx2048m --add-opens java.base/java.lang=ALL-UNNAMED -cp "$TARGET_JAR" sokoban.ParserPlanToString ff_output.log > "$planFile"
+
+    # Afficher le plan
+    echo "Plan as movements: "
+    cat "$planFile"
+
+    # Nettoyer le fichier de plan temporaire
+    rm ff_output.log
+
+    # Exécuter Sokoban avec le plan généré
+    java -server -Xms2048m -Xmx2048m --add-opens java.base/java.lang=ALL-UNNAMED -cp "$TARGET_JAR" sokoban.SokobanMain "$1" "$planFile"
 }
 
-# Function to show heuristic options
+# Fonction pour afficher les options d'heuristique
 show_heuristic() {
     echo "0. AJUSTED_SUM"
     echo "1. AJUSTED_SUM2"
@@ -94,14 +154,14 @@ show_heuristic() {
     echo "8. SUM_MUTEX"
 }
 
-# Function to show main menu
+# Fonction pour afficher le menu principal
 show_main_menu() {
     echo "| 1. Enter JSON file"
     echo "| 2. Exit"
     echo " ----------"
 }
 
-# Function to show planner menu
+# Fonction pour afficher le menu du planificateur
 show_planner_menu() {
     echo "| 1. Solve with HSP"
     echo "| 2. Solve with FF"
@@ -109,37 +169,37 @@ show_planner_menu() {
     echo " ----------"
 }
 
-# Function to read user options for main menu
+# Fonction pour lire les options de l'utilisateur pour le menu principal
 read_main_options() {
     read -p "Enter choice [1 - 2] : " choice
     case $choice in
         1) read -p "Enter the name of the JSON file to test from the config folder: " exercice
-           jsonFile="config/$exercice"
-           if convertJsonToPDDL $jsonFile; then
+           local jsonFile="$CONFIG_DIR/$exercice"
+           if convertJsonToPDDL "$jsonFile"; then
                show_planner_menu
-               read_planner_options $exercice
+               read_planner_options "$exercice"
            else
                show_main_menu
                read_main_options
            fi ;;
         2) exit 0 ;;
-        *) echo "Error..." && sleep 1
+        *) echo "Error: Invalid choice." && sleep 1
     esac
 }
 
-# Function to read user options for planner menu
+# Fonction pour lire les options de l'utilisateur pour le menu du planificateur
 read_planner_options() {
-    exercice=$1
+    local exercice=$1
     read -p "Enter choice [1 - 3] : " choice
     case $choice in
-        1) solveHSP $exercice ;;
-        2) solveFF $exercice ;;
+        1) solveHSP "$exercice" ;;
+        2) solveFF "$exercice" ;;
         3) show_main_menu && read_main_options ;;
-        *) echo "Error..." && sleep 1
+        *) echo "Error: Invalid choice." && sleep 1
     esac
 }
 
-# Main logic
+# Logique principale
 compile_project
 
 echo "****************************************"

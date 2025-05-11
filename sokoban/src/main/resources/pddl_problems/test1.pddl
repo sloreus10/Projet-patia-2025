@@ -1,166 +1,277 @@
 (define (problem sokoban-level1)
   (:domain sokoban)
   (:objects
-    l0_0 - sol
-    l0_1 - sol
-    l0_2 - sol
-    l0_3 - sol
-    l0_4 - sol
-    l0_5 - sol
-    l1_0 - sol
-    l1_1 - sol
-    l1_2 - sol
-    l1_3 - sol
-    l1_4 - sol
-    l1_5 - sol
-    l2_0 - sol
-    l2_1 - sol
-    l2_2 - sol
-    l2_3 - sol
-    l2_4 - sol
-    l2_5 - sol
-    l3_0 - sol
-    l3_1 - sol
-    l3_2 - sol
-    l3_3 - sol
-    l3_4 - sol
-    l3_5 - sol
-    l4_0 - sol
-    l4_1 - sol
-    l4_2 - sol
-    l4_3 - sol
-    l4_4 - sol
-    l4_5 - sol
-    l5_0 - sol
-    l5_1 - sol
-    l5_2 - sol
-    l5_3 - sol
-    l5_4 - sol
-    l5_5 - sol
-    l6_0 - sol
-    l6_1 - sol
-    l6_2 - sol
-    l6_3 - sol
-    l6_4 - sol
-    l6_5 - sol
-    l7_0 - sol
-    l7_1 - sol
-    l7_2 - sol
-    l7_3 - sol
-    l7_4 - sol
-    l7_5 - sol
-    a - agent
-    b - boite
+    pos0_0 - sol
+    pos0_1 - sol
+    pos0_2 - sol
+    pos0_3 - sol
+    pos0_4 - sol
+    pos0_5 - sol
+    pos1_0 - sol
+    pos1_1 - sol
+    pos1_2 - sol
+    pos1_3 - sol
+    pos1_4 - sol
+    pos1_5 - sol
+    pos2_0 - sol
+    pos2_1 - sol
+    pos2_2 - sol
+    pos2_3 - sol
+    pos2_4 - sol
+    pos2_5 - sol
+    pos3_0 - sol
+    pos3_1 - sol
+    pos3_2 - sol
+    pos3_3 - sol
+    pos3_4 - sol
+    pos3_5 - sol
+    pos4_0 - sol
+    pos4_1 - sol
+    pos4_2 - sol
+    pos4_3 - sol
+    pos4_4 - sol
+    pos4_5 - sol
+    pos5_0 - sol
+    pos5_1 - sol
+    pos5_2 - sol
+    pos5_3 - sol
+    pos5_4 - sol
+    pos5_5 - sol
+    pos6_0 - sol
+    pos6_1 - sol
+    pos6_2 - sol
+    pos6_3 - sol
+    pos6_4 - sol
+    pos6_5 - sol
+    pos7_0 - sol
+    pos7_1 - sol
+    pos7_2 - sol
+    pos7_3 - sol
+    pos7_4 - sol
+    pos7_5 - sol
+    box1 box2 - boite
+    agent1 - agent
   )
   (:init
-    (a_voisin_droit l0_0 l0_1)
-    (a_voisin_haut l0_0 l1_0)
-    (a_voisin_droit l0_1 l0_2)
-    (a_voisin_haut l0_1 l1_1)
-    (a_voisin_droit l0_2 l0_3)
-    (a_voisin_haut l0_2 l1_2)
-    (a_voisin_droit l0_3 l0_4)
-    (a_voisin_haut l0_3 l1_3)
-    (a_voisin_droit l0_4 l0_5)
-    (a_voisin_haut l0_4 l1_4)
-    (a_voisin_haut l0_5 l1_5)
-    (a_voisin_droit l1_0 l1_1)
-    (a_voisin_haut l1_0 l2_0)
-    (a_voisin_droit l1_1 l1_2)
-    (a_voisin_haut l1_1 l2_1)
-    (a_voisin_droit l1_2 l1_3)
-    (a_voisin_haut l1_2 l2_2)
-    (a_voisin_droit l1_3 l1_4)
-    (a_voisin_haut l1_3 l2_3)
-    (a_voisin_droit l1_4 l1_5)
-    (a_voisin_haut l1_4 l2_4)
-    (a_voisin_haut l1_5 l2_5)
-    (a_voisin_droit l2_0 l2_1)
-    (a_voisin_haut l2_0 l3_0)
-    (a_voisin_droit l2_1 l2_2)
-    (a_voisin_haut l2_1 l3_1)
-    (a_voisin_droit l2_2 l2_3)
-    (a_voisin_haut l2_2 l3_2)
-    (a_voisin_droit l2_3 l2_4)
-    (a_voisin_haut l2_3 l3_3)
-    (a_voisin_droit l2_4 l2_5)
-    (a_voisin_haut l2_4 l3_4)
-    (a_voisin_haut l2_5 l3_5)
-    (a_voisin_droit l3_0 l3_1)
-    (a_voisin_haut l3_0 l4_0)
-    (a_voisin_droit l3_1 l3_2)
-    (a_voisin_haut l3_1 l4_1)
-    (a_voisin_droit l3_2 l3_3)
-    (a_voisin_haut l3_2 l4_2)
-    (a_voisin_droit l3_3 l3_4)
-    (a_voisin_haut l3_3 l4_3)
-    (a_voisin_droit l3_4 l3_5)
-    (a_voisin_haut l3_4 l4_4)
-    (a_voisin_haut l3_5 l4_5)
-    (a_voisin_droit l4_0 l4_1)
-    (a_voisin_haut l4_0 l5_0)
-    (a_voisin_droit l4_1 l4_2)
-    (a_voisin_haut l4_1 l5_1)
-    (a_voisin_droit l4_2 l4_3)
-    (a_voisin_haut l4_2 l5_2)
-    (a_voisin_droit l4_3 l4_4)
-    (a_voisin_haut l4_3 l5_3)
-    (a_voisin_droit l4_4 l4_5)
-    (a_voisin_haut l4_4 l5_4)
-    (a_voisin_haut l4_5 l5_5)
-    (a_voisin_droit l5_0 l5_1)
-    (a_voisin_haut l5_0 l6_0)
-    (a_voisin_droit l5_1 l5_2)
-    (a_voisin_haut l5_1 l6_1)
-    (a_voisin_droit l5_2 l5_3)
-    (a_voisin_haut l5_2 l6_2)
-    (a_voisin_droit l5_3 l5_4)
-    (a_voisin_haut l5_3 l6_3)
-    (a_voisin_droit l5_4 l5_5)
-    (a_voisin_haut l5_4 l6_4)
-    (a_voisin_haut l5_5 l6_5)
-    (a_voisin_droit l6_0 l6_1)
-    (a_voisin_haut l6_0 l7_0)
-    (a_voisin_droit l6_1 l6_2)
-    (a_voisin_haut l6_1 l7_1)
-    (a_voisin_droit l6_2 l6_3)
-    (a_voisin_haut l6_2 l7_2)
-    (a_voisin_droit l6_3 l6_4)
-    (a_voisin_haut l6_3 l7_3)
-    (a_voisin_droit l6_4 l6_5)
-    (a_voisin_haut l6_4 l7_4)
-    (a_voisin_haut l6_5 l7_5)
-    (a_voisin_droit l7_0 l7_1)
-    (a_voisin_droit l7_1 l7_2)
-    (a_voisin_droit l7_2 l7_3)
-    (a_voisin_droit l7_3 l7_4)
-    (a_voisin_droit l7_4 l7_5)
-    (est_libre l0_0)
-    (est_libre l0_1)
-    (est_libre l1_0)
-    (est_libre l1_1)
-    (est_libre l1_3)
-    (est_libre l1_4)
-    (est_libre l2_3)
-    (est_destination l2_4)
-    (est_libre l2_4)
-    (est_libre l3_1)
-    (est_libre l3_2)
-    (est_libre l3_3)
-    (est_libre l3_4)
-    (est_libre l4_1)
-    (agent_est_sur a l4_3)
-    (est_libre l4_4)
-    (est_libre l5_1)
-    (boite_est_sur b l5_2)
-    (est_libre l5_3)
-    (est_libre l5_4)
-    (est_libre l6_2)
-    (est_libre l6_3)
-    (est_libre l6_4)
-    (est_libre l7_0)
+    (a_voisin_droit pos0_0 pos0_1)
+    (a_voisin_haut pos1_0 pos0_0)
+    (a_voisin_droit pos0_1 pos0_2)
+    (a_voisin_droit pos0_0 pos0_1)
+    (a_voisin_haut pos1_1 pos0_1)
+    (a_voisin_droit pos0_2 pos0_3)
+    (a_voisin_droit pos0_1 pos0_2)
+    (a_voisin_haut pos1_2 pos0_2)
+    (a_voisin_droit pos0_3 pos0_4)
+    (a_voisin_droit pos0_2 pos0_3)
+    (a_voisin_haut pos1_3 pos0_3)
+    (a_voisin_droit pos0_4 pos0_5)
+    (a_voisin_droit pos0_3 pos0_4)
+    (a_voisin_haut pos1_4 pos0_4)
+    (a_voisin_droit pos0_4 pos0_5)
+    (a_voisin_haut pos1_5 pos0_5)
+    (a_voisin_droit pos1_0 pos1_1)
+    (a_voisin_haut pos2_0 pos1_0)
+    (a_voisin_haut pos1_0 pos0_0)
+    (a_voisin_droit pos1_1 pos1_2)
+    (a_voisin_droit pos1_0 pos1_1)
+    (a_voisin_haut pos2_1 pos1_1)
+    (a_voisin_haut pos1_1 pos0_1)
+    (a_voisin_droit pos1_2 pos1_3)
+    (a_voisin_droit pos1_1 pos1_2)
+    (a_voisin_haut pos2_2 pos1_2)
+    (a_voisin_haut pos1_2 pos0_2)
+    (a_voisin_droit pos1_3 pos1_4)
+    (a_voisin_droit pos1_2 pos1_3)
+    (a_voisin_haut pos2_3 pos1_3)
+    (a_voisin_haut pos1_3 pos0_3)
+    (a_voisin_droit pos1_4 pos1_5)
+    (a_voisin_droit pos1_3 pos1_4)
+    (a_voisin_haut pos2_4 pos1_4)
+    (a_voisin_haut pos1_4 pos0_4)
+    (a_voisin_droit pos1_4 pos1_5)
+    (a_voisin_haut pos2_5 pos1_5)
+    (a_voisin_haut pos1_5 pos0_5)
+    (a_voisin_droit pos2_0 pos2_1)
+    (a_voisin_haut pos3_0 pos2_0)
+    (a_voisin_haut pos2_0 pos1_0)
+    (a_voisin_droit pos2_1 pos2_2)
+    (a_voisin_droit pos2_0 pos2_1)
+    (a_voisin_haut pos3_1 pos2_1)
+    (a_voisin_haut pos2_1 pos1_1)
+    (a_voisin_droit pos2_2 pos2_3)
+    (a_voisin_droit pos2_1 pos2_2)
+    (a_voisin_haut pos3_2 pos2_2)
+    (a_voisin_haut pos2_2 pos1_2)
+    (a_voisin_droit pos2_3 pos2_4)
+    (a_voisin_droit pos2_2 pos2_3)
+    (a_voisin_haut pos3_3 pos2_3)
+    (a_voisin_haut pos2_3 pos1_3)
+    (a_voisin_droit pos2_4 pos2_5)
+    (a_voisin_droit pos2_3 pos2_4)
+    (a_voisin_haut pos3_4 pos2_4)
+    (a_voisin_haut pos2_4 pos1_4)
+    (a_voisin_droit pos2_4 pos2_5)
+    (a_voisin_haut pos3_5 pos2_5)
+    (a_voisin_haut pos2_5 pos1_5)
+    (a_voisin_droit pos3_0 pos3_1)
+    (a_voisin_haut pos4_0 pos3_0)
+    (a_voisin_haut pos3_0 pos2_0)
+    (a_voisin_droit pos3_1 pos3_2)
+    (a_voisin_droit pos3_0 pos3_1)
+    (a_voisin_haut pos4_1 pos3_1)
+    (a_voisin_haut pos3_1 pos2_1)
+    (a_voisin_droit pos3_2 pos3_3)
+    (a_voisin_droit pos3_1 pos3_2)
+    (a_voisin_haut pos4_2 pos3_2)
+    (a_voisin_haut pos3_2 pos2_2)
+    (a_voisin_droit pos3_3 pos3_4)
+    (a_voisin_droit pos3_2 pos3_3)
+    (a_voisin_haut pos4_3 pos3_3)
+    (a_voisin_haut pos3_3 pos2_3)
+    (a_voisin_droit pos3_4 pos3_5)
+    (a_voisin_droit pos3_3 pos3_4)
+    (a_voisin_haut pos4_4 pos3_4)
+    (a_voisin_haut pos3_4 pos2_4)
+    (a_voisin_droit pos3_4 pos3_5)
+    (a_voisin_haut pos4_5 pos3_5)
+    (a_voisin_haut pos3_5 pos2_5)
+    (a_voisin_droit pos4_0 pos4_1)
+    (a_voisin_haut pos5_0 pos4_0)
+    (a_voisin_haut pos4_0 pos3_0)
+    (a_voisin_droit pos4_1 pos4_2)
+    (a_voisin_droit pos4_0 pos4_1)
+    (a_voisin_haut pos5_1 pos4_1)
+    (a_voisin_haut pos4_1 pos3_1)
+    (a_voisin_droit pos4_2 pos4_3)
+    (a_voisin_droit pos4_1 pos4_2)
+    (a_voisin_haut pos5_2 pos4_2)
+    (a_voisin_haut pos4_2 pos3_2)
+    (a_voisin_droit pos4_3 pos4_4)
+    (a_voisin_droit pos4_2 pos4_3)
+    (a_voisin_haut pos5_3 pos4_3)
+    (a_voisin_haut pos4_3 pos3_3)
+    (a_voisin_droit pos4_4 pos4_5)
+    (a_voisin_droit pos4_3 pos4_4)
+    (a_voisin_haut pos5_4 pos4_4)
+    (a_voisin_haut pos4_4 pos3_4)
+    (a_voisin_droit pos4_4 pos4_5)
+    (a_voisin_haut pos5_5 pos4_5)
+    (a_voisin_haut pos4_5 pos3_5)
+    (a_voisin_droit pos5_0 pos5_1)
+    (a_voisin_haut pos6_0 pos5_0)
+    (a_voisin_haut pos5_0 pos4_0)
+    (a_voisin_droit pos5_1 pos5_2)
+    (a_voisin_droit pos5_0 pos5_1)
+    (a_voisin_haut pos6_1 pos5_1)
+    (a_voisin_haut pos5_1 pos4_1)
+    (a_voisin_droit pos5_2 pos5_3)
+    (a_voisin_droit pos5_1 pos5_2)
+    (a_voisin_haut pos6_2 pos5_2)
+    (a_voisin_haut pos5_2 pos4_2)
+    (a_voisin_droit pos5_3 pos5_4)
+    (a_voisin_droit pos5_2 pos5_3)
+    (a_voisin_haut pos6_3 pos5_3)
+    (a_voisin_haut pos5_3 pos4_3)
+    (a_voisin_droit pos5_4 pos5_5)
+    (a_voisin_droit pos5_3 pos5_4)
+    (a_voisin_haut pos6_4 pos5_4)
+    (a_voisin_haut pos5_4 pos4_4)
+    (a_voisin_droit pos5_4 pos5_5)
+    (a_voisin_haut pos6_5 pos5_5)
+    (a_voisin_haut pos5_5 pos4_5)
+    (a_voisin_droit pos6_0 pos6_1)
+    (a_voisin_haut pos7_0 pos6_0)
+    (a_voisin_haut pos6_0 pos5_0)
+    (a_voisin_droit pos6_1 pos6_2)
+    (a_voisin_droit pos6_0 pos6_1)
+    (a_voisin_haut pos7_1 pos6_1)
+    (a_voisin_haut pos6_1 pos5_1)
+    (a_voisin_droit pos6_2 pos6_3)
+    (a_voisin_droit pos6_1 pos6_2)
+    (a_voisin_haut pos7_2 pos6_2)
+    (a_voisin_haut pos6_2 pos5_2)
+    (a_voisin_droit pos6_3 pos6_4)
+    (a_voisin_droit pos6_2 pos6_3)
+    (a_voisin_haut pos7_3 pos6_3)
+    (a_voisin_haut pos6_3 pos5_3)
+    (a_voisin_droit pos6_4 pos6_5)
+    (a_voisin_droit pos6_3 pos6_4)
+    (a_voisin_haut pos7_4 pos6_4)
+    (a_voisin_haut pos6_4 pos5_4)
+    (a_voisin_droit pos6_4 pos6_5)
+    (a_voisin_haut pos7_5 pos6_5)
+    (a_voisin_haut pos6_5 pos5_5)
+    (a_voisin_droit pos7_0 pos7_1)
+    (a_voisin_haut pos7_0 pos6_0)
+    (a_voisin_droit pos7_1 pos7_2)
+    (a_voisin_droit pos7_0 pos7_1)
+    (a_voisin_haut pos7_1 pos6_1)
+    (a_voisin_droit pos7_2 pos7_3)
+    (a_voisin_droit pos7_1 pos7_2)
+    (a_voisin_haut pos7_2 pos6_2)
+    (a_voisin_droit pos7_3 pos7_4)
+    (a_voisin_droit pos7_2 pos7_3)
+    (a_voisin_haut pos7_3 pos6_3)
+    (a_voisin_droit pos7_4 pos7_5)
+    (a_voisin_droit pos7_3 pos7_4)
+    (a_voisin_haut pos7_4 pos6_4)
+    (a_voisin_droit pos7_4 pos7_5)
+    (a_voisin_haut pos7_5 pos6_5)
+    (est_libre pos0_0)
+    (est_libre pos0_1)
+    (est_mur pos0_2)
+    (est_mur pos0_3)
+    (est_mur pos0_4)
+    (est_mur pos0_5)
+    (est_libre pos1_0)
+    (est_libre pos1_1)
+    (est_mur pos1_2)
+    (est_libre pos1_3)
+    (est_libre pos1_4)
+    (est_mur pos1_5)
+    (est_mur pos2_0)
+    (est_mur pos2_1)
+    (est_mur pos2_2)
+    (est_libre pos2_3)
+    (est_destination pos2_4)
+    (est_libre pos2_4)
+    (est_mur pos2_5)
+    (est_mur pos3_0)
+    (est_libre pos3_1)
+    (est_libre pos3_2)
+    (boite_est_sur box1 pos3_3)
+    (est_destination pos3_3)
+    (boite_sur_cible box1)
+    (est_libre pos3_4)
+    (est_mur pos3_5)
+    (est_mur pos4_0)
+    (est_libre pos4_1)
+    (est_mur pos4_2)
+    (agent_est_sur agent1 pos4_3)
+    (est_libre pos4_4)
+    (est_mur pos4_5)
+    (est_mur pos5_0)
+    (est_libre pos5_1)
+    (boite_est_sur box1 pos5_2)
+    (boite_est_sur box1 pos5_3)
+    (est_destination pos5_3)
+    (boite_sur_cible box1)
+    (est_libre pos5_4)
+    (est_mur pos5_5)
+    (est_mur pos6_0)
+    (est_mur pos6_1)
+    (est_libre pos6_2)
+    (est_libre pos6_3)
+    (est_libre pos6_4)
+    (est_mur pos6_5)
+    (est_libre pos7_0)
+    (est_mur pos7_1)
+    (est_mur pos7_2)
+    (est_mur pos7_3)
+    (est_mur pos7_4)
+    (est_mur pos7_5)
   )
   (:goal (and
-    (boite_est_sur b l2_4)
+    (boite_sur_cible box1)
   ))
 )

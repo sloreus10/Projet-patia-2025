@@ -28,16 +28,14 @@ public class ParserPlanToString {
         String line;
 
         while ((line = reader.readLine()) != null) {
-            if (line.contains("move")) {
-                if (line.contains("left")) {
-                    result.append("L");
-                } else if (line.contains("right")) {
-                    result.append("R");
-                } else if (line.contains("up")) {
-                    result.append("U");
-                } else if (line.contains("down")) {
-                    result.append("D");
-                }
+            if (line.contains("deplacement_droit")) {
+                result.append("R");
+            } else if (line.contains("deplacement_gauche")) {
+                result.append("L");
+            } else if (line.contains("deplacement_haut")) {
+                result.append("U");
+            } else if (line.contains("deplacement_bas")) {
+                result.append("D");
             }
         }
 
