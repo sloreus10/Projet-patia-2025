@@ -1,5 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fr.uga.pddl4j</groupId>
@@ -10,8 +11,9 @@
 
     <properties>
         <gamengine.version>3.15.2</gamengine.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -20,31 +22,26 @@
             <artifactId>core</artifactId>
             <version>${gamengine.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.codingame.gameengine</groupId>
             <artifactId>module-entities</artifactId>
             <version>${gamengine.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.codingame.gameengine</groupId>
             <artifactId>runner</artifactId>
             <version>${gamengine.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.codingame.gameengine</groupId>
             <artifactId>module-tooltip</artifactId>
             <version>${gamengine.version}</version>
         </dependency>
-
         <dependency>
             <groupId>fr.uga</groupId>
             <artifactId>pddl4j</artifactId>
             <version>4.0.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -93,6 +90,17 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <release>17</release>
+                </configuration>
             </plugin>
         </plugins>
     </build>

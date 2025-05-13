@@ -1,145 +1,475 @@
-(define (problem sokoban-level1)
+(define (problem sokoban-problem)
   (:domain sokoban)
   (:objects
-    l0_0 - sol
-    l0_1 - sol
-    l0_2 - sol
-    l0_3 - sol
-    l1_0 - sol
-    l1_1 - sol
-    l1_2 - sol
-    l1_3 - sol
-    l2_0 - sol
-    l2_1 - sol
-    l2_2 - sol
-    l2_3 - sol
-    l3_0 - sol
-    l3_1 - sol
-    l3_2 - sol
-    l3_3 - sol
-    l4_0 - sol
-    l4_1 - sol
-    l4_2 - sol
-    l4_3 - sol
-    l5_0 - sol
-    l5_1 - sol
-    l5_2 - sol
-    l5_3 - sol
-    l6_0 - sol
-    l6_1 - sol
-    l6_2 - sol
-    l6_3 - sol
-    l7_0 - sol
-    l7_1 - sol
-    l7_2 - sol
-    l7_3 - sol
-    l8_0 - sol
-    l8_1 - sol
-    l8_2 - sol
-    l8_3 - sol
-    a - agent
-    b - boite
+    pos-0-0 - position
+    pos-1-0 - position
+    pos-2-0 - position
+    pos-3-0 - position
+    pos-4-0 - position
+    pos-5-0 - position
+    pos-6-0 - position
+    pos-7-0 - position
+    pos-8-0 - position
+    pos-0-1 - position
+    pos-1-1 - position
+    pos-2-1 - position
+    pos-3-1 - position
+    pos-4-1 - position
+    pos-5-1 - position
+    pos-6-1 - position
+    pos-7-1 - position
+    pos-8-1 - position
+    pos-0-2 - position
+    pos-1-2 - position
+    pos-2-2 - position
+    pos-3-2 - position
+    pos-4-2 - position
+    pos-5-2 - position
+    pos-6-2 - position
+    pos-7-2 - position
+    pos-8-2 - position
+    pos-0-3 - position
+    pos-1-3 - position
+    pos-2-3 - position
+    pos-3-3 - position
+    pos-4-3 - position
+    pos-5-3 - position
+    pos-6-3 - position
+    pos-7-3 - position
+    pos-8-3 - position
+    pos-0-4 - position
+    pos-1-4 - position
+    pos-2-4 - position
+    pos-3-4 - position
+    pos-4-4 - position
+    pos-5-4 - position
+    pos-6-4 - position
+    pos-7-4 - position
+    pos-8-4 - position
+    pos-0-5 - position
+    pos-1-5 - position
+    pos-2-5 - position
+    pos-3-5 - position
+    pos-4-5 - position
+    pos-5-5 - position
+    pos-6-5 - position
+    pos-7-5 - position
+    pos-8-5 - position
+    pos-0-6 - position
+    pos-1-6 - position
+    pos-2-6 - position
+    pos-3-6 - position
+    pos-4-6 - position
+    pos-5-6 - position
+    pos-6-6 - position
+    pos-7-6 - position
+    pos-8-6 - position
+    pos-0-7 - position
+    pos-1-7 - position
+    pos-2-7 - position
+    pos-3-7 - position
+    pos-4-7 - position
+    pos-5-7 - position
+    pos-6-7 - position
+    pos-7-7 - position
+    pos-8-7 - position
+    pos-0-8 - position
+    pos-1-8 - position
+    pos-2-8 - position
+    pos-3-8 - position
+    pos-4-8 - position
+    pos-5-8 - position
+    pos-6-8 - position
+    pos-7-8 - position
+    pos-8-8 - position
   )
   (:init
-    (a_voisin_droit l0_0 l0_1)
-    (a_voisin_haut l0_0 l1_0)
-    (a_voisin_droit l0_1 l0_2)
-    (a_voisin_haut l0_1 l1_1)
-    (a_voisin_droit l0_2 l0_3)
-    (a_voisin_haut l0_2 l1_2)
-    (a_voisin_haut l0_3 l1_3)
-    (a_voisin_droit l1_0 l1_1)
-    (a_voisin_haut l1_0 l2_0)
-    (a_voisin_droit l1_1 l1_2)
-    (a_voisin_haut l1_1 l2_1)
-    (a_voisin_droit l1_2 l1_3)
-    (a_voisin_haut l1_2 l2_2)
-    (a_voisin_haut l1_3 l2_3)
-    (a_voisin_droit l2_0 l2_1)
-    (a_voisin_haut l2_0 l3_0)
-    (a_voisin_droit l2_1 l2_2)
-    (a_voisin_haut l2_1 l3_1)
-    (a_voisin_droit l2_2 l2_3)
-    (a_voisin_haut l2_2 l3_2)
-    (a_voisin_haut l2_3 l3_3)
-    (a_voisin_droit l3_0 l3_1)
-    (a_voisin_haut l3_0 l4_0)
-    (a_voisin_droit l3_1 l3_2)
-    (a_voisin_haut l3_1 l4_1)
-    (a_voisin_droit l3_2 l3_3)
-    (a_voisin_haut l3_2 l4_2)
-    (a_voisin_haut l3_3 l4_3)
-    (a_voisin_droit l4_0 l4_1)
-    (a_voisin_haut l4_0 l5_0)
-    (a_voisin_droit l4_1 l4_2)
-    (a_voisin_haut l4_1 l5_1)
-    (a_voisin_droit l4_2 l4_3)
-    (a_voisin_haut l4_2 l5_2)
-    (a_voisin_haut l4_3 l5_3)
-    (a_voisin_droit l5_0 l5_1)
-    (a_voisin_haut l5_0 l6_0)
-    (a_voisin_droit l5_1 l5_2)
-    (a_voisin_haut l5_1 l6_1)
-    (a_voisin_droit l5_2 l5_3)
-    (a_voisin_haut l5_2 l6_2)
-    (a_voisin_haut l5_3 l6_3)
-    (a_voisin_droit l6_0 l6_1)
-    (a_voisin_haut l6_0 l7_0)
-    (a_voisin_droit l6_1 l6_2)
-    (a_voisin_haut l6_1 l7_1)
-    (a_voisin_droit l6_2 l6_3)
-    (a_voisin_haut l6_2 l7_2)
-    (a_voisin_haut l6_3 l7_3)
-    (a_voisin_droit l7_0 l7_1)
-    (a_voisin_haut l7_0 l8_0)
-    (a_voisin_droit l7_1 l7_2)
-    (a_voisin_haut l7_1 l8_1)
-    (a_voisin_droit l7_2 l7_3)
-    (a_voisin_haut l7_2 l8_2)
-    (a_voisin_haut l7_3 l8_3)
-    (a_voisin_droit l8_0 l8_1)
-    (a_voisin_droit l8_1 l8_2)
-    (a_voisin_droit l8_2 l8_3)
-    (est_libre l1_1)
-    (est_libre l1_2)
-    (est_libre l1_4)
-    (est_libre l2_1)
-    (est_libre l2_2)
-    (est_libre l2_6)
-    (est_libre l2_7)
-    (est_libre l3_1)
-    (est_libre l3_2)
-    (est_libre l3_4)
-    (est_libre l3_5)
-    (est_libre l3_6)
-    (est_libre l3_7)
-    (est_libre l4_2)
-    (est_libre l4_3)
-    (est_destination l4_4)
-    (est_libre l4_4)
-    (est_libre l4_5)
-    (est_libre l4_6)
-    (est_libre l4_7)
-    (est_libre l5_1)
-    (boite_est_sur b l5_2)
-    (est_libre l5_3)
-    (boite_est_sur b l5_4)
-    (boite_est_sur b l5_5)
-    (agent_est_sur a l5_6)
-    (est_libre l6_1)
-    (est_libre l6_2)
-    (est_destination l6_4)
-    (est_libre l6_4)
-    (est_destination l6_5)
-    (est_libre l6_5)
-    (est_libre l7_1)
-    (est_libre l7_2)
-    (est_libre l7_4)
-    (est_libre l7_5)
+    (adjacent pos-0-0 pos-1-0)
+    (adjacent pos-1-0 pos-0-0)
+    (adjacent pos-0-0 pos-0-1)
+    (adjacent pos-0-1 pos-0-0)
+    (adjacent pos-1-0 pos-2-0)
+    (adjacent pos-2-0 pos-1-0)
+    (adjacent pos-1-0 pos-1-1)
+    (adjacent pos-1-1 pos-1-0)
+    (adjacent pos-2-0 pos-3-0)
+    (adjacent pos-3-0 pos-2-0)
+    (adjacent pos-2-0 pos-2-1)
+    (adjacent pos-2-1 pos-2-0)
+    (adjacent pos-3-0 pos-4-0)
+    (adjacent pos-4-0 pos-3-0)
+    (adjacent pos-3-0 pos-3-1)
+    (adjacent pos-3-1 pos-3-0)
+    (adjacent pos-4-0 pos-5-0)
+    (adjacent pos-5-0 pos-4-0)
+    (adjacent pos-4-0 pos-4-1)
+    (adjacent pos-4-1 pos-4-0)
+    (adjacent pos-5-0 pos-6-0)
+    (adjacent pos-6-0 pos-5-0)
+    (adjacent pos-5-0 pos-5-1)
+    (adjacent pos-5-1 pos-5-0)
+    (adjacent pos-6-0 pos-7-0)
+    (adjacent pos-7-0 pos-6-0)
+    (adjacent pos-6-0 pos-6-1)
+    (adjacent pos-6-1 pos-6-0)
+    (adjacent pos-7-0 pos-8-0)
+    (adjacent pos-8-0 pos-7-0)
+    (adjacent pos-7-0 pos-7-1)
+    (adjacent pos-7-1 pos-7-0)
+    (adjacent pos-8-0 pos-8-1)
+    (adjacent pos-8-1 pos-8-0)
+    (adjacent pos-0-1 pos-1-1)
+    (adjacent pos-1-1 pos-0-1)
+    (adjacent pos-0-1 pos-0-2)
+    (adjacent pos-0-2 pos-0-1)
+    (adjacent pos-1-1 pos-2-1)
+    (adjacent pos-2-1 pos-1-1)
+    (adjacent pos-1-1 pos-1-2)
+    (adjacent pos-1-2 pos-1-1)
+    (adjacent pos-2-1 pos-3-1)
+    (adjacent pos-3-1 pos-2-1)
+    (adjacent pos-2-1 pos-2-2)
+    (adjacent pos-2-2 pos-2-1)
+    (adjacent pos-3-1 pos-4-1)
+    (adjacent pos-4-1 pos-3-1)
+    (adjacent pos-3-1 pos-3-2)
+    (adjacent pos-3-2 pos-3-1)
+    (adjacent pos-4-1 pos-5-1)
+    (adjacent pos-5-1 pos-4-1)
+    (adjacent pos-4-1 pos-4-2)
+    (adjacent pos-4-2 pos-4-1)
+    (adjacent pos-5-1 pos-6-1)
+    (adjacent pos-6-1 pos-5-1)
+    (adjacent pos-5-1 pos-5-2)
+    (adjacent pos-5-2 pos-5-1)
+    (adjacent pos-6-1 pos-7-1)
+    (adjacent pos-7-1 pos-6-1)
+    (adjacent pos-6-1 pos-6-2)
+    (adjacent pos-6-2 pos-6-1)
+    (adjacent pos-7-1 pos-8-1)
+    (adjacent pos-8-1 pos-7-1)
+    (adjacent pos-7-1 pos-7-2)
+    (adjacent pos-7-2 pos-7-1)
+    (adjacent pos-8-1 pos-8-2)
+    (adjacent pos-8-2 pos-8-1)
+    (adjacent pos-0-2 pos-1-2)
+    (adjacent pos-1-2 pos-0-2)
+    (adjacent pos-0-2 pos-0-3)
+    (adjacent pos-0-3 pos-0-2)
+    (adjacent pos-1-2 pos-2-2)
+    (adjacent pos-2-2 pos-1-2)
+    (adjacent pos-1-2 pos-1-3)
+    (adjacent pos-1-3 pos-1-2)
+    (adjacent pos-2-2 pos-3-2)
+    (adjacent pos-3-2 pos-2-2)
+    (adjacent pos-2-2 pos-2-3)
+    (adjacent pos-2-3 pos-2-2)
+    (adjacent pos-3-2 pos-4-2)
+    (adjacent pos-4-2 pos-3-2)
+    (adjacent pos-3-2 pos-3-3)
+    (adjacent pos-3-3 pos-3-2)
+    (adjacent pos-4-2 pos-5-2)
+    (adjacent pos-5-2 pos-4-2)
+    (adjacent pos-4-2 pos-4-3)
+    (adjacent pos-4-3 pos-4-2)
+    (adjacent pos-5-2 pos-6-2)
+    (adjacent pos-6-2 pos-5-2)
+    (adjacent pos-5-2 pos-5-3)
+    (adjacent pos-5-3 pos-5-2)
+    (adjacent pos-6-2 pos-7-2)
+    (adjacent pos-7-2 pos-6-2)
+    (adjacent pos-6-2 pos-6-3)
+    (adjacent pos-6-3 pos-6-2)
+    (adjacent pos-7-2 pos-8-2)
+    (adjacent pos-8-2 pos-7-2)
+    (adjacent pos-7-2 pos-7-3)
+    (adjacent pos-7-3 pos-7-2)
+    (adjacent pos-8-2 pos-8-3)
+    (adjacent pos-8-3 pos-8-2)
+    (adjacent pos-0-3 pos-1-3)
+    (adjacent pos-1-3 pos-0-3)
+    (adjacent pos-0-3 pos-0-4)
+    (adjacent pos-0-4 pos-0-3)
+    (adjacent pos-1-3 pos-2-3)
+    (adjacent pos-2-3 pos-1-3)
+    (adjacent pos-1-3 pos-1-4)
+    (adjacent pos-1-4 pos-1-3)
+    (adjacent pos-2-3 pos-3-3)
+    (adjacent pos-3-3 pos-2-3)
+    (adjacent pos-2-3 pos-2-4)
+    (adjacent pos-2-4 pos-2-3)
+    (adjacent pos-3-3 pos-4-3)
+    (adjacent pos-4-3 pos-3-3)
+    (adjacent pos-3-3 pos-3-4)
+    (adjacent pos-3-4 pos-3-3)
+    (adjacent pos-4-3 pos-5-3)
+    (adjacent pos-5-3 pos-4-3)
+    (adjacent pos-4-3 pos-4-4)
+    (adjacent pos-4-4 pos-4-3)
+    (adjacent pos-5-3 pos-6-3)
+    (adjacent pos-6-3 pos-5-3)
+    (adjacent pos-5-3 pos-5-4)
+    (adjacent pos-5-4 pos-5-3)
+    (adjacent pos-6-3 pos-7-3)
+    (adjacent pos-7-3 pos-6-3)
+    (adjacent pos-6-3 pos-6-4)
+    (adjacent pos-6-4 pos-6-3)
+    (adjacent pos-7-3 pos-8-3)
+    (adjacent pos-8-3 pos-7-3)
+    (adjacent pos-7-3 pos-7-4)
+    (adjacent pos-7-4 pos-7-3)
+    (adjacent pos-8-3 pos-8-4)
+    (adjacent pos-8-4 pos-8-3)
+    (adjacent pos-0-4 pos-1-4)
+    (adjacent pos-1-4 pos-0-4)
+    (adjacent pos-0-4 pos-0-5)
+    (adjacent pos-0-5 pos-0-4)
+    (adjacent pos-1-4 pos-2-4)
+    (adjacent pos-2-4 pos-1-4)
+    (adjacent pos-1-4 pos-1-5)
+    (adjacent pos-1-5 pos-1-4)
+    (adjacent pos-2-4 pos-3-4)
+    (adjacent pos-3-4 pos-2-4)
+    (adjacent pos-2-4 pos-2-5)
+    (adjacent pos-2-5 pos-2-4)
+    (adjacent pos-3-4 pos-4-4)
+    (adjacent pos-4-4 pos-3-4)
+    (adjacent pos-3-4 pos-3-5)
+    (adjacent pos-3-5 pos-3-4)
+    (adjacent pos-4-4 pos-5-4)
+    (adjacent pos-5-4 pos-4-4)
+    (adjacent pos-4-4 pos-4-5)
+    (adjacent pos-4-5 pos-4-4)
+    (adjacent pos-5-4 pos-6-4)
+    (adjacent pos-6-4 pos-5-4)
+    (adjacent pos-5-4 pos-5-5)
+    (adjacent pos-5-5 pos-5-4)
+    (adjacent pos-6-4 pos-7-4)
+    (adjacent pos-7-4 pos-6-4)
+    (adjacent pos-6-4 pos-6-5)
+    (adjacent pos-6-5 pos-6-4)
+    (adjacent pos-7-4 pos-8-4)
+    (adjacent pos-8-4 pos-7-4)
+    (adjacent pos-7-4 pos-7-5)
+    (adjacent pos-7-5 pos-7-4)
+    (adjacent pos-8-4 pos-8-5)
+    (adjacent pos-8-5 pos-8-4)
+    (adjacent pos-0-5 pos-1-5)
+    (adjacent pos-1-5 pos-0-5)
+    (adjacent pos-0-5 pos-0-6)
+    (adjacent pos-0-6 pos-0-5)
+    (adjacent pos-1-5 pos-2-5)
+    (adjacent pos-2-5 pos-1-5)
+    (adjacent pos-1-5 pos-1-6)
+    (adjacent pos-1-6 pos-1-5)
+    (adjacent pos-2-5 pos-3-5)
+    (adjacent pos-3-5 pos-2-5)
+    (adjacent pos-2-5 pos-2-6)
+    (adjacent pos-2-6 pos-2-5)
+    (adjacent pos-3-5 pos-4-5)
+    (adjacent pos-4-5 pos-3-5)
+    (adjacent pos-3-5 pos-3-6)
+    (adjacent pos-3-6 pos-3-5)
+    (adjacent pos-4-5 pos-5-5)
+    (adjacent pos-5-5 pos-4-5)
+    (adjacent pos-4-5 pos-4-6)
+    (adjacent pos-4-6 pos-4-5)
+    (adjacent pos-5-5 pos-6-5)
+    (adjacent pos-6-5 pos-5-5)
+    (adjacent pos-5-5 pos-5-6)
+    (adjacent pos-5-6 pos-5-5)
+    (adjacent pos-6-5 pos-7-5)
+    (adjacent pos-7-5 pos-6-5)
+    (adjacent pos-6-5 pos-6-6)
+    (adjacent pos-6-6 pos-6-5)
+    (adjacent pos-7-5 pos-8-5)
+    (adjacent pos-8-5 pos-7-5)
+    (adjacent pos-7-5 pos-7-6)
+    (adjacent pos-7-6 pos-7-5)
+    (adjacent pos-8-5 pos-8-6)
+    (adjacent pos-8-6 pos-8-5)
+    (adjacent pos-0-6 pos-1-6)
+    (adjacent pos-1-6 pos-0-6)
+    (adjacent pos-0-6 pos-0-7)
+    (adjacent pos-0-7 pos-0-6)
+    (adjacent pos-1-6 pos-2-6)
+    (adjacent pos-2-6 pos-1-6)
+    (adjacent pos-1-6 pos-1-7)
+    (adjacent pos-1-7 pos-1-6)
+    (adjacent pos-2-6 pos-3-6)
+    (adjacent pos-3-6 pos-2-6)
+    (adjacent pos-2-6 pos-2-7)
+    (adjacent pos-2-7 pos-2-6)
+    (adjacent pos-3-6 pos-4-6)
+    (adjacent pos-4-6 pos-3-6)
+    (adjacent pos-3-6 pos-3-7)
+    (adjacent pos-3-7 pos-3-6)
+    (adjacent pos-4-6 pos-5-6)
+    (adjacent pos-5-6 pos-4-6)
+    (adjacent pos-4-6 pos-4-7)
+    (adjacent pos-4-7 pos-4-6)
+    (adjacent pos-5-6 pos-6-6)
+    (adjacent pos-6-6 pos-5-6)
+    (adjacent pos-5-6 pos-5-7)
+    (adjacent pos-5-7 pos-5-6)
+    (adjacent pos-6-6 pos-7-6)
+    (adjacent pos-7-6 pos-6-6)
+    (adjacent pos-6-6 pos-6-7)
+    (adjacent pos-6-7 pos-6-6)
+    (adjacent pos-7-6 pos-8-6)
+    (adjacent pos-8-6 pos-7-6)
+    (adjacent pos-7-6 pos-7-7)
+    (adjacent pos-7-7 pos-7-6)
+    (adjacent pos-8-6 pos-8-7)
+    (adjacent pos-8-7 pos-8-6)
+    (adjacent pos-0-7 pos-1-7)
+    (adjacent pos-1-7 pos-0-7)
+    (adjacent pos-0-7 pos-0-8)
+    (adjacent pos-0-8 pos-0-7)
+    (adjacent pos-1-7 pos-2-7)
+    (adjacent pos-2-7 pos-1-7)
+    (adjacent pos-1-7 pos-1-8)
+    (adjacent pos-1-8 pos-1-7)
+    (adjacent pos-2-7 pos-3-7)
+    (adjacent pos-3-7 pos-2-7)
+    (adjacent pos-2-7 pos-2-8)
+    (adjacent pos-2-8 pos-2-7)
+    (adjacent pos-3-7 pos-4-7)
+    (adjacent pos-4-7 pos-3-7)
+    (adjacent pos-3-7 pos-3-8)
+    (adjacent pos-3-8 pos-3-7)
+    (adjacent pos-4-7 pos-5-7)
+    (adjacent pos-5-7 pos-4-7)
+    (adjacent pos-4-7 pos-4-8)
+    (adjacent pos-4-8 pos-4-7)
+    (adjacent pos-5-7 pos-6-7)
+    (adjacent pos-6-7 pos-5-7)
+    (adjacent pos-5-7 pos-5-8)
+    (adjacent pos-5-8 pos-5-7)
+    (adjacent pos-6-7 pos-7-7)
+    (adjacent pos-7-7 pos-6-7)
+    (adjacent pos-6-7 pos-6-8)
+    (adjacent pos-6-8 pos-6-7)
+    (adjacent pos-7-7 pos-8-7)
+    (adjacent pos-8-7 pos-7-7)
+    (adjacent pos-7-7 pos-7-8)
+    (adjacent pos-7-8 pos-7-7)
+    (adjacent pos-8-7 pos-8-8)
+    (adjacent pos-8-8 pos-8-7)
+    (adjacent pos-0-8 pos-1-8)
+    (adjacent pos-1-8 pos-0-8)
+    (adjacent pos-1-8 pos-2-8)
+    (adjacent pos-2-8 pos-1-8)
+    (adjacent pos-2-8 pos-3-8)
+    (adjacent pos-3-8 pos-2-8)
+    (adjacent pos-3-8 pos-4-8)
+    (adjacent pos-4-8 pos-3-8)
+    (adjacent pos-4-8 pos-5-8)
+    (adjacent pos-5-8 pos-4-8)
+    (adjacent pos-5-8 pos-6-8)
+    (adjacent pos-6-8 pos-5-8)
+    (adjacent pos-6-8 pos-7-8)
+    (adjacent pos-7-8 pos-6-8)
+    (adjacent pos-7-8 pos-8-8)
+    (adjacent pos-8-8 pos-7-8)
+    (wall pos-0-0)
+    (wall pos-1-0)
+    (wall pos-2-0)
+    (wall pos-3-0)
+    (wall pos-0-1)
+    (wall pos-3-1)
+    (wall pos-5-1)
+    (wall pos-6-1)
+    (wall pos-7-1)
+    (wall pos-8-1)
+    (wall pos-0-2)
+    (wall pos-3-2)
+    (wall pos-4-2)
+    (wall pos-5-2)
+    (wall pos-8-2)
+    (wall pos-0-3)
+    (wall pos-3-3)
+    (wall pos-8-3)
+    (wall pos-0-4)
+    (wall pos-1-4)
+    (wall pos-8-4)
+    (wall pos-0-5)
+    (wall pos-7-5)
+    (wall pos-8-5)
+    (wall pos-0-6)
+    (wall pos-3-6)
+    (wall pos-6-6)
+    (wall pos-7-6)
+    (wall pos-0-7)
+    (wall pos-3-7)
+    (wall pos-6-7)
+    (wall pos-0-8)
+    (wall pos-1-8)
+    (wall pos-2-8)
+    (wall pos-3-8)
+    (wall pos-4-8)
+    (wall pos-5-8)
+    (wall pos-6-8)
+    (free pos-4-0)
+    (free pos-5-0)
+    (free pos-6-0)
+    (free pos-7-0)
+    (free pos-8-0)
+    (free pos-1-1)
+    (free pos-2-1)
+    (free pos-4-1)
+    (free pos-1-2)
+    (free pos-2-2)
+    (free pos-6-2)
+    (free pos-7-2)
+    (free pos-1-3)
+    (free pos-2-3)
+    (free pos-4-3)
+    (free pos-5-3)
+    (free pos-6-3)
+    (free pos-7-3)
+    (free pos-2-4)
+    (free pos-3-4)
+    (free pos-4-4)
+    (free pos-5-4)
+    (free pos-6-4)
+    (free pos-7-4)
+    (free pos-1-5)
+    (free pos-2-5)
+    (free pos-3-5)
+    (free pos-4-5)
+    (free pos-5-5)
+    (free pos-6-5)
+    (free pos-1-6)
+    (free pos-2-6)
+    (free pos-4-6)
+    (free pos-5-6)
+    (free pos-8-6)
+    (free pos-1-7)
+    (free pos-2-7)
+    (free pos-4-7)
+    (free pos-5-7)
+    (free pos-7-7)
+    (free pos-8-7)
+    (free pos-7-8)
+    (free pos-8-8)
+    (has_box pos-5-4)
+    (has_box pos-6-4)
+    (has_box pos-2-5)
+    (has_box pos-4-5)
+    (has_box pos-5-5)
+    (is_target pos-4-4)
+    (is_target pos-5-4)
+    (is_target pos-6-4)
+    (is_target pos-4-6)
+    (is_target pos-5-6)
+    (has_player pos-6-5)
   )
   (:goal (and
-    (boite_est_sur b l4_4)
-    (boite_est_sur b l6_4)
-    (boite_est_sur b l6_5)
+    (boiteSurCible pos-4-4)
+    (boiteSurCible pos-5-4)
+    (boiteSurCible pos-6-4)
+    (boiteSurCible pos-4-6)
+    (boiteSurCible pos-5-6)
   ))
 )

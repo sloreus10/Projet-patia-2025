@@ -1,213 +1,140 @@
 package sokoban;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.JSONException;
 
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
- * This parser reads a JSON file containing a textual representation of a Sokoban level
- * and generates a PDDL file describing the corresponding problem.
+ * Convertit un fichier JSON représentant une grille Sokoban en fichier PDDL conforme au domaine.
  */
 public class ParserJsonToPDDL {
 
-    // Constants for map characters
-    private static final char WALL = '#';
-    private static final char BOX = '$';
-    private static final char BOX_ON_TARGET = '*';
-    private static final char TARGET = '.';
-    private static final char AGENT = '@';
-    private static final char EMPTY = ' ';
+    record Coord(int x, int y) {}
+
+    public static void genererFichierPDDL(String fichierJSON, String fichierPDDL) throws IOException {
+        String contenu = new String(Files.readAllBytes(Paths.get(fichierJSON)));
+        JSONObject json = new JSONObject(contenu);
+
+        String testIn = json.getString("testIn");
+        String[] lignes = testIn.split("\n");
+        int height = lignes.length;
+        int width = Arrays.stream(lignes).mapToInt(String::length).max().orElse(0);
+
+        List<Coord> walls = new ArrayList<>();
+        List<Coord> boxes = new ArrayList<>();
+        List<Coord> goals = new ArrayList<>();
+        Coord player = null;
+
+        // Analyse du contenu ligne par ligne
+        for (int y = 0; y < height; y++) {
+            String ligne = lignes[y];
+            for (int x = 0; x < ligne.length(); x++) {
+                char c = ligne.charAt(x);
+                Coord pos = new Coord(x, y);
+                switch (c) {
+                    case '#': walls.add(pos); break;
+                    case '@': player = pos; break;
+                    case '$': boxes.add(pos); break;
+                    case '.': goals.add(pos); break;
+                    case '*':
+                        boxes.add(pos);
+                        goals.add(pos);
+                        break;
+                    // espace : case vide, rien à faire
+                }
+            }
+        }
+
+        // Génération du fichier PDDL
+        StringBuilder pddl = new StringBuilder();
+        pddl.append("(define (problem sokoban-problem)\n");
+        pddl.append("  (:domain sokoban)\n");
+
+        // Déclaration des objets
+        pddl.append("  (:objects\n");
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                pddl.append("    pos-").append(x).append("-").append(y).append(" - position\n");
+            }
+        }
+        pddl.append("  )\n");
+
+        // Initialisation
+        pddl.append("  (:init\n");
+
+        // Relations de voisinage (adjacent)
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                String from = "pos-" + x + "-" + y;
+                if (x < width - 1) {
+                    String to = "pos-" + (x + 1) + "-" + y;
+                    pddl.append("    (adjacent ").append(from).append(" ").append(to).append(")\n");
+                    pddl.append("    (adjacent ").append(to).append(" ").append(from).append(")\n");
+                }
+                if (y < height - 1) {
+                    String to = "pos-" + x + "-" + (y + 1);
+                    pddl.append("    (adjacent ").append(from).append(" ").append(to).append(")\n");
+                    pddl.append("    (adjacent ").append(to).append(" ").append(from).append(")\n");
+                }
+            }
+        }
+
+        // Prédicats de mur
+        for (Coord wall : walls) {
+            pddl.append("    (wall pos-").append(wall.x).append("-").append(wall.y).append(")\n");
+        }
+
+        // Prédicats de cases libres (non murées)
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Coord pos = new Coord(x, y);
+                if (!walls.contains(pos)) {
+                    pddl.append("    (free pos-").append(x).append("-").append(y).append(")\n");
+                }
+            }
+        }
+
+        // Boîtes
+        for (Coord box : boxes) {
+            pddl.append("    (has_box pos-").append(box.x).append("-").append(box.y).append(")\n");
+        }
+
+        // Cibles
+        for (Coord goal : goals) {
+            pddl.append("    (is_target pos-").append(goal.x).append("-").append(goal.y).append(")\n");
+        }
+
+        // Joueur
+        if (player != null) {
+            pddl.append("    (has_player pos-").append(player.x).append("-").append(player.y).append(")\n");
+        }
+
+        pddl.append("  )\n");
+
+        // Objectif
+        pddl.append("  (:goal (and\n");
+        for (Coord goal : goals) {
+            pddl.append("    (boiteSurCible pos-").append(goal.x).append("-").append(goal.y).append(")\n");
+        }
+        pddl.append("  ))\n)\n");
+
+        Files.write(Paths.get(fichierPDDL), pddl.toString().getBytes());
+    }
 
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.err.println("Usage: java sokoban.ParserJsonToPDDL <input.json> <output.pddl>");
+            System.err.println("Usage: java sokoban.ParserJsonToPDDL <fichierJSON> <fichierPDDL>");
             System.exit(1);
         }
-
-        String jsonFilePath = args[0];
-        String pddlFilePath = args[1];
 
         try {
-            parseJsonToPDDL(jsonFilePath, pddlFilePath);
+            genererFichierPDDL(args[0], args[1]);
+            System.out.println("Fichier PDDL généré avec succès : " + args[1]);
         } catch (IOException e) {
-            System.err.println("Error reading/writing files: " + e.getMessage());
             e.printStackTrace();
-        } catch (JSONException e) {
-            System.err.println("Error parsing JSON file: " + e.getMessage());
-            System.exit(1);
         }
-    }
-
-    /**
-     * Converts a Sokoban map represented in JSON to PDDL format.
-     *
-     * @param jsonFilePath  path to the input JSON file
-     * @param pddlFilePath  path to the output PDDL file
-     * @throws IOException  in case of file reading/writing issues
-     */
-    public static void parseJsonToPDDL(String jsonFilePath, String pddlFilePath) throws IOException {
-        try (FileInputStream fis = new FileInputStream(jsonFilePath);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {
-
-            JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
-
-            // Read the level map
-            String testIn = jsonObject.getString("testIn");
-            String[] lines = testIn.split("\n");
-
-            try (FileWriter writer = new FileWriter(pddlFilePath)) {
-                writePDDLHeader(writer);
-                writeObjects(writer, lines);
-                writeInit(writer, lines);
-                writeGoal(writer, lines);
-            } catch (IOException e) {
-                System.err.println("Error writing to the PDDL file: " + e.getMessage());
-                e.printStackTrace();
-                throw e;
-            }
-
-        } catch (IOException e) {
-            System.err.println("Error reading JSON file: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    /**
-     * Writes the header of the PDDL file.
-     *
-     * @param writer  the FileWriter to write to the PDDL file
-     * @throws IOException  in case of writing issues
-     */
-    private static void writePDDLHeader(FileWriter writer) throws IOException {
-        writer.write("(define (problem sokoban-level1)\n");
-        writer.write("  (:domain sokoban)\n");
-    }
-
-    /**
-     * Writes the objects section of the PDDL file.
-     *
-     * @param writer  the FileWriter to write to the PDDL file
-     * @param lines   the lines of the Sokoban map
-     * @throws IOException  in case of writing issues
-     */
-    private static void writeObjects(FileWriter writer, String[] lines) throws IOException {
-        writer.write("  (:objects\n");
-        int rows = lines.length;
-        int cols = lines[0].length();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                writer.write("    pos" + i + "_" + j + " - sol\n");
-            }
-        }
-        writer.write("    box1 box2 - boite\n");
-        writer.write("    agent1 - agent\n");
-        writer.write("  )\n");
-    }
-
-    /**
-     * Writes the initialization section of the PDDL file.
-     *
-     * @param writer  the FileWriter to write to the PDDL file
-     * @param lines   the lines of the Sokoban map
-     * @throws IOException  in case of writing issues
-     */
-    private static void writeInit(FileWriter writer, String[] lines) throws IOException {
-        writer.write("  (:init\n");
-
-        int rows = lines.length;
-        int cols = lines[0].length();
-
-        // Add adjacency relationships
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                String loc = "pos" + i + "_" + j;
-                if (j < cols - 1) {
-                    String rightLoc = "pos" + i + "_" + (j + 1);
-                    writer.write("    (a_voisin_droit " + loc + " " + rightLoc + ")\n");
-                }
-                if (j > 0) {
-                    String leftLoc = "pos" + i + "_" + (j - 1);
-                    writer.write("    (a_voisin_droit " + leftLoc + " " + loc + ")\n");
-                }
-                if (i < rows - 1) {
-                    String upLoc = "pos" + (i + 1) + "_" + j;
-                    writer.write("    (a_voisin_haut " + upLoc + " " + loc + ")\n");
-                }
-                if (i > 0) {
-                    String downLoc = "pos" + (i - 1) + "_" + j;
-                    writer.write("    (a_voisin_haut " + loc + " " + downLoc + ")\n");
-                }
-            }
-        }
-
-        // Write initial states
-        for (int i = 0; i < rows; i++) {
-            String line = lines[i];
-            for (int j = 0; j < line.length(); j++) {
-                char c = line.charAt(j);
-                String loc = "pos" + i + "_" + j;
-
-                switch (c) {
-                    case WALL:
-                        writer.write("    (est_mur " + loc + ")\n");
-                        break;
-                    case BOX:
-                        writer.write("    (boite_est_sur box1 " + loc + ")\n");
-                        break;
-                    case BOX_ON_TARGET:
-                        writer.write("    (boite_est_sur box1 " + loc + ")\n");
-                        writer.write("    (est_destination " + loc + ")\n");
-                        writer.write("    (boite_sur_cible box1)\n");
-                        break;
-                    case TARGET:
-                        writer.write("    (est_destination " + loc + ")\n");
-                        writer.write("    (est_libre " + loc + ")\n");
-                        break;
-                    case AGENT:
-                        writer.write("    (agent_est_sur agent1 " + loc + ")\n");
-                        break;
-                    default:
-                        if (c == EMPTY) {
-                            writer.write("    (est_libre " + loc + ")\n");
-                        }
-                        break;
-                }
-            }
-        }
-
-        writer.write("  )\n");
-    }
-
-    /**
-     * Writes the goal section of the PDDL file.
-     *
-     * @param writer  the FileWriter to write to the PDDL file
-     * @param lines   the lines of the Sokoban map
-     * @throws IOException  in case of writing issues
-     */
-    private static void writeGoal(FileWriter writer, String[] lines) throws IOException {
-        writer.write("  (:goal (and\n");
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            for (int j = 0; j < line.length(); j++) {
-                char c = line.charAt(j);
-                String loc = "pos" + i + "_" + j;
-
-                if (c == TARGET) {
-                    writer.write("    (boite_sur_cible box1)\n");
-                }
-            }
-        }
-
-        writer.write("  ))\n");
-        writer.write(")\n");
     }
 }

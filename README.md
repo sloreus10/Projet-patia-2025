@@ -129,7 +129,73 @@ Puis on suit les étapes tout en choisissant l'option 2 qui est FF
 
 Pour le timeout : 200
 
-
 ## 3. sokoban
 
 Pour le sokoban, il faut se rendre dans le dossier sokoban
+
+```
+cd sokoban
+```
+
+### Structure du dossier sokoban (point essentiel)
+
+sokoban/
+├── config/          # les fichiers de configuration .json
+├── src/
+│   ├── main/
+
+│   │   ├── java/
+
+│   │   │   ├── sokoban/
+
+│   │   │    │    ├── Agent.java                           # prend le plan (L,R,U,D) en args pour resoudre la partie
+
+│   │   │    │    ├── Board.java
+
+│    │   │    │    ├── Box.java
+
+│    │   │    │    ├── Cell.java
+
+│    │   │    │    ├── ParserJsonToPDDL.java          # permet de passer le .json en prob.pddl
+
+│    │   │    │    ├── ParserPlanToString.java         # permet de passer les moveements en (L,R,U,D)
+
+│    │   │    │    ├── SokobanMain.java                 # pour lancer le jeu (configuré pour re)
+
+│    │   ├── resources/
+
+│    │   │   ├── pddl_problems/                            # les prob.pddl générés par le ParserJsonToPDDL
+
+│    │   │   ├── plansString/                                 # les plans.txt générés par le ParserPlanToString
+
+│    │   │   ├── domain.pddl                                # le domain.pddl pour resoudre les prob.pddl générés
+
+│    |    ├── test/
+│   ├── temp_plan.txt
+
+│   ├── lanceur.sh                                              # le script permettant de faire les manipulation
+│   └── pom.xml                                                # contient les packages requis
+└── README.md                                               # readme de base
+
+### Processus de test
+
+- 1- Lancer le scripte avec la commande depuis le dossier racine sokoban:
+
+  - ```
+    ./lanceur.sh
+    ```
+- 2- Compiler le projet
+
+  - Choisir l'option 2 du menu puis 5 du sous-menu pour clean, compile et package
+- 3- Générer un prob.pddl depuis json
+
+  - Choisir l'option 2 menu principal
+  - Puis saisir sur le terminal le nom du fichier à traduire avec .json (EX: test1.json) ces fichiers sont dans le dossier config
+  - valider avec la touche ENTRER du clavier
+  - le vifier est généré dans le dossier pddl_problems (voir la structure du dossier)
+- 4- Choisir un planificateur dans le menu(1 pour HSP, 2 pour FF) si c'est 1 continuer choisir un
+- 5-Saisir le temps d'exécution souhaiter en secondes (600 par defaut)
+- 6- Suivre l'exécution, il va générer et afficher le plan puis lancer le serveur du jeu pour le web accessible dans cette url : http://localhost:4200/test.html
+
+
+# 4. Sat
